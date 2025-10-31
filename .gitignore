@@ -1,0 +1,52 @@
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# EmailJS config (if storing keys locally - DON'T commit keys!)
+# emailjs-config.js
+
+# Build files (if you add build process later)
+dist/
+build/
+*.min.js
+*.min.css
+
+# Backup files
+*.bak
+*.backup
+*~
+

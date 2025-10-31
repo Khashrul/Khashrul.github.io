@@ -1,0 +1,28 @@
+{
+  "name": "B.M. Khashrul Alam - Portfolio",
+  "short_name": "Khashrul Portfolio",
+  "description": "Backend Engineer specializing in E-Commerce platforms, ERP systems, Laravel, Microservices, and AI Integration",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/profile.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/profile.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "display": "standalone",
+  "start_url": "/",
+  "orientation": "portrait"
+}
+
