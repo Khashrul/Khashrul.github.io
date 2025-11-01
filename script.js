@@ -1,42 +1,211 @@
 // script.js - Adds interactive and animated effects for the portfolio site
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Loading screen fade out
+  // Loading screen - wait for "Welcome to the portfolio." to appear before hiding
   const loadingScreen = document.getElementById('loading-screen');
   if (loadingScreen) {
-    setTimeout(() => {
-      loadingScreen.style.opacity = '0';
+    // Ensure loading screen is visible and blocking everything
+    loadingScreen.style.display = 'flex';
+    loadingScreen.style.opacity = '1';
+    loadingScreen.style.visibility = 'visible';
+    loadingScreen.style.zIndex = '99999';
+    
+    // Ensure body has loading class to prevent scrolling
+    document.body.classList.add('loading');
+    document.body.style.overflow = 'hidden';
+    
+    const bootLines = loadingScreen.querySelectorAll('.boot-line');
+    const welcomeLine = Array.from(bootLines).find(line => 
+      line.textContent.includes('Welcome to the portfolio')
+    );
+    
+    let hasHidden = false; // Prevent multiple calls
+    
+    const hideLoadingScreen = () => {
+      if (hasHidden) return; // Prevent duplicate calls
+      hasHidden = true;
+      
+      // Wait a moment after the welcome message appears for users to read it
       setTimeout(() => {
-        loadingScreen.style.display = 'none';
-        document.body.classList.remove('loading');
-      }, 600);
-    }, 2200);
+        loadingScreen.style.opacity = '0';
+        loadingScreen.style.transition = 'opacity 0.6s ease, visibility 0s linear 0.6s';
+        loadingScreen.style.visibility = 'hidden';
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+          document.body.classList.remove('loading');
+          document.body.style.overflow = ''; // Re-enable scrolling
+          
+          // Trigger hero section animations after loading screen is removed
+          const heroLeft = document.querySelector('.hero-left');
+          const heroRight = document.querySelector('.hero-right');
+          
+          // Make sections visible first with hardware acceleration
+          if (heroLeft) {
+            heroLeft.style.visibility = 'visible';
+            heroLeft.style.opacity = '0';
+            heroLeft.style.transform = 'translate3d(-30px, 0, 0)';
+            heroLeft.style.willChange = 'opacity, transform';
+            // Force reflow for smooth animation
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                heroLeft.style.animation = 'fadeInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+              });
+            });
+          }
+          
+          if (heroRight) {
+            heroRight.style.visibility = 'visible';
+            heroRight.style.opacity = '0';
+            heroRight.style.transform = 'translate3d(100px, 0, 0)';
+            heroRight.style.willChange = 'opacity, transform';
+            // Force reflow for smooth animation
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                heroRight.style.animation = 'slideInFromRight 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s forwards';
+              });
+            });
+          }
+          
+          // Start typing animation after loading screen
+          setTimeout(() => {
+            const typingText = document.querySelector('.typing-text');
+            const cursor = document.querySelector('.cursor');
+            if (typingText && typingText.dataset.text) {
+              const text = typingText.dataset.text;
+              let i = 0;
+              typingText.textContent = '';
+              
+              if (cursor) {
+                cursor.style.opacity = '1';
+                cursor.style.animation = 'blink 1s infinite';
+              }
+              
+              function typeChar() {
+                if (i < text.length) {
+                  typingText.textContent += text[i++];
+                  const delay = (text[i-1] === ' ' || text[i-1] === '.') ? 150 : 100;
+                  setTimeout(typeChar, delay);
+                } else {
+                  if (cursor) {
+                    cursor.style.animation = 'blink 1s infinite';
+                  }
+                }
+              }
+              
+              typeChar();
+            }
+          }, 800); // Start typing after hero animations begin
+        }, 600);
+      }, 500); // Wait 0.5 seconds after welcome message is fully visible
+    };
+    
+    if (welcomeLine) {
+      // Get animation timing from CSS
+      const style = window.getComputedStyle(welcomeLine);
+      const animationDelay = parseFloat(style.animationDelay) || 2.6;
+      const animationDuration = parseFloat(style.animationDuration) || 0.5;
+      
+      // Calculate when welcome line animation should complete
+      const animationCompleteTime = (animationDelay + animationDuration) * 1000;
+      
+      // Method 1: Listen for animation end event (most reliable)
+      const handleAnimationEnd = (e) => {
+        if (e.animationName === 'typeIn' || !e.animationName) {
+          hideLoadingScreen();
+        }
+      };
+      welcomeLine.addEventListener('animationend', handleAnimationEnd, { once: true });
+      
+      // Method 2: Use calculated timeout based on CSS timing (most reliable fallback)
+      // Wait for: animation delay + animation duration + pause for reading
+      const totalWaitTime = animationCompleteTime + 500; // +0.5s pause after animation
+      
+      setTimeout(() => {
+        if (!hasHidden) {
+          hideLoadingScreen();
+        }
+      }, totalWaitTime);
+      
+      // Method 3: Check visibility as backup (only if above methods fail)
+      let checkCount = 0;
+      let visibleSince = null;
+      const maxChecks = 80; // Check for up to 8 seconds
+      const visibilityCheck = setInterval(() => {
+        if (hasHidden) {
+          clearInterval(visibilityCheck);
+          return;
+        }
+        
+        checkCount++;
+        const currentStyle = window.getComputedStyle(welcomeLine);
+        const opacity = parseFloat(currentStyle.opacity);
+        
+        // Track when welcome line becomes fully visible (opacity = 1 or close to it)
+        if (opacity > 0.9 && visibleSince === null) {
+          visibleSince = Date.now();
+        }
+        
+        // Wait until welcome line has been fully visible for at least 0.5 seconds
+        if (visibleSince !== null && (Date.now() - visibleSince) >= 500 && opacity > 0.9) {
+          clearInterval(visibilityCheck);
+          if (!hasHidden) {
+            hideLoadingScreen();
+          }
+        } else if (checkCount >= maxChecks) {
+          // Last resort: force hide after max checks
+          clearInterval(visibilityCheck);
+          if (!hasHidden) {
+            hideLoadingScreen();
+          }
+        }
+      }, 100); // Check every 100ms
+    } else {
+      // Fallback: if welcome line not found, use default timing
+      setTimeout(hideLoadingScreen, 4100); // 2.6s delay + 0.5s animation + 1.5s = ~4.6s
+    }
   }
 
-  // Typing animation for hero name
-  const typingText = document.querySelector('.typing-text');
-  if (typingText && typingText.dataset.text) {
-    const text = typingText.dataset.text;
-    let i = 0;
-    typingText.textContent = '';
-    function typeChar() {
-      if (i < text.length) {
-        typingText.textContent += text[i++];
-        setTimeout(typeChar, 80);
-      }
-    }
-    typeChar();
-  }
+  // Typing animation for hero name - will be triggered after loading screen
+  // This is handled in the loading screen hide function
 
-  // Animate skill bars
-  document.querySelectorAll('.skill-progress').forEach(bar => {
-    const progress = bar.getAttribute('data-progress');
-    if (progress) {
-      setTimeout(() => {
-        bar.style.width = progress + '%';
-      }, 800);
-    }
+  // Animate skill bars with staggered animation when scrolled into view
+  const skillBars = document.querySelectorAll('.skill-progress');
+  
+  // Set initial state
+  skillBars.forEach(bar => {
+    bar.style.width = '0%';
   });
+  
+  // Intersection Observer to trigger animations when section is visible
+  const animateSkillBars = (entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const skillProgressBars = entry.target.querySelectorAll('.skill-progress');
+        skillProgressBars.forEach((bar, index) => {
+          const progress = bar.getAttribute('data-progress');
+          if (progress) {
+            // Staggered animation - each bar animates with delay
+            setTimeout(() => {
+              bar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+              bar.style.width = progress + '%';
+            }, index * 100); // 100ms delay between each bar
+          }
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  };
+  
+  const skillsObserver = new IntersectionObserver(animateSkillBars, {
+    threshold: 0.2, // Trigger when 20% of section is visible
+    rootMargin: '0px'
+  });
+  
+  // Observe the skills section
+  const skillsSection = document.querySelector('.skills-section');
+  if (skillsSection) {
+    skillsObserver.observe(skillsSection);
+  }
 
   // Skills Network Graph
   const networkCanvas = document.getElementById('skillsNetwork');
@@ -175,23 +344,26 @@ document.addEventListener('DOMContentLoaded', function() {
       const centerNode = nodes.find(n => n.id === 'center');
 
       // Draw connections
+      // Get all nodes connected to the active (hovered) node
+      const activeNodeConnections = activeNode ? getConnectedNodes(activeNode.id) : new Set();
+      
       connections.forEach(([from, to]) => {
         const fromNode = nodes.find(n => n.id === from);
         const toNode = nodes.find(n => n.id === to);
         if (fromNode && toNode) {
-          // Check if this is the connection from hovered node to center
+          // Check if this connection involves the hovered node
           const isHoveredConnection = activeNode && (
-            (from === activeNode.id && to === 'center') || 
-            (to === activeNode.id && from === 'center')
+            (from === activeNode.id && activeNodeConnections.has(to)) || 
+            (to === activeNode.id && activeNodeConnections.has(from))
           );
           
           if (isHoveredConnection && animationProgress > 0) {
-            // Highlight the line from hovered node to center
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-            ctx.lineWidth = 2;
+            // Highlight connections to relevant nodes with green color
+            ctx.strokeStyle = 'rgba(57, 255, 20, 0.8)'; // Green color
+            ctx.lineWidth = 2.5;
           } else {
             // All other connections are dimmed
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
             ctx.lineWidth = 1;
           }
           ctx.beginPath();
@@ -207,22 +379,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const isSelected = selectedNode && selectedNode.id === node.id;
         const isHoveredNode = isHighlighted || isSelected;
         
-        // Calculate size - ONLY hovered node scales up
+        // Calculate size - ONLY hovered node scales up (smaller scale)
         let actualSize = node.size;
         if (isHoveredNode && animationProgress > 0) {
-          // Only the hovered node scales up, and only when animationProgress > 0
-          actualSize = node.size * (1 + 0.8 * animationProgress);
+          // Only the hovered node scales up, but smaller (reduced from 0.8 to 0.4)
+          actualSize = node.size * (1 + 0.4 * animationProgress);
         }
 
-        // Outer glow - ONLY for hovered node
+        // Outer glow - ONLY for hovered node (smaller glow)
         if (isHoveredNode && animationProgress > 0) {
           ctx.beginPath();
-          ctx.arc(node.x, node.y, actualSize + 3, 0, 2 * Math.PI);
-          const gradient = ctx.createRadialGradient(node.x, node.y, actualSize, node.x, node.y, actualSize + 15);
+          ctx.arc(node.x, node.y, actualSize + 2, 0, 2 * Math.PI);
+          const gradient = ctx.createRadialGradient(node.x, node.y, actualSize, node.x, node.y, actualSize + 10);
           gradient.addColorStop(0, node.color);
           gradient.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.fillStyle = gradient;
-          ctx.globalAlpha = 0.5 * animationProgress;
+          ctx.globalAlpha = 0.4 * animationProgress;
           ctx.fill();
           ctx.globalAlpha = 1;
         }
@@ -255,11 +427,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isHoveredNode && animationProgress > 0) {
           if (node.id === 'center') {
             const baseSize = 13;
-            const targetSize = 18;
+            const targetSize = 16; // Reduced from 18 to 16
             fontSize = 'bold ' + (baseSize + (targetSize - baseSize) * animationProgress) + 'px';
           } else {
             const baseSize = 10;
-            const targetSize = 14;
+            const targetSize = 12; // Reduced from 14 to 12
             fontSize = (baseSize + (targetSize - baseSize) * animationProgress) + 'px';
           }
         } else {
