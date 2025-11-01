@@ -832,19 +832,20 @@ body:not(.loading) .hero-right {
 
 .about-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 4rem;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2.5rem;
   align-items: start;
 }
 
 .about-text {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: var(--font-mono);
   letter-spacing: 0.3px;
+  line-height: 1.7;
 }
 
 .about-text p {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .philosophy-box {
@@ -903,31 +904,39 @@ body:not(.loading) .hero-right {
   background: var(--tertiary-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 2.5rem;
-  margin-top: 2rem;
+  padding: 2rem;
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .philosophy-section h3 {
   color: var(--text-primary);
   font-family: var(--font-mono);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   text-align: center;
 }
 
 .philosophy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .philosophy-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .philosophy-card {
   background: var(--secondary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.2rem;
   text-align: center;
   transition: var(--transition-medium);
 }
@@ -939,8 +948,8 @@ body:not(.loading) .hero-right {
 }
 
 .philosophy-card .card-icon {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  margin-bottom: 0.75rem;
   display: block;
 }
 
@@ -948,14 +957,14 @@ body:not(.loading) .hero-right {
   color: var(--text-primary);
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .philosophy-card p {
   color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   line-height: 1.4;
 }
 
@@ -963,15 +972,15 @@ body:not(.loading) .hero-right {
   background: var(--primary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 2rem;
-  margin-top: 1.5rem;
+  padding: 1.2rem;
+  margin-top: 1.2rem;
 }
 
 .formula-flow {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
@@ -979,12 +988,12 @@ body:not(.loading) .hero-right {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
+  gap: 0.4rem;
+  padding: 0.75rem;
   background: var(--tertiary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  min-width: 120px;
+  min-width: 100px;
   transition: var(--transition-medium);
 }
 
@@ -1002,20 +1011,20 @@ body:not(.loading) .hero-right {
   font-family: var(--font-mono);
   font-weight: bold;
   color: var(--text-primary);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
 }
 
 .step-text {
   font-family: var(--font-mono);
   font-weight: 500;
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-align: center;
 }
 
 .flow-arrow {
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -1166,14 +1175,14 @@ body:not(.loading) .hero-right {
 .about-highlights {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.2rem;
 }
 
 .highlight-card {
   background: var(--tertiary-bg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.3rem;
   transition: var(--transition-medium);
 }
 
@@ -1203,6 +1212,82 @@ body:not(.loading) .hero-right {
 /* Experience Section */
 .experience-section {
   padding: 5rem 0;
+}
+
+/* Education Section */
+.education-section {
+  padding: 5rem 0;
+  background: var(--secondary-bg);
+}
+
+.education-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.education-card {
+  background: var(--primary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: var(--transition-medium);
+}
+
+.education-card:hover {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 20px var(--shadow-color);
+  transform: translateY(-2px);
+}
+
+.education-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.education-icon {
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.education-info {
+  flex: 1;
+}
+
+.education-info h3 {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.education-institution {
+  color: var(--accent-gold);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.education-location {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.education-details {
+  color: var(--text-secondary);
 }
 
 /* Professional Profiles Section */
@@ -2598,6 +2683,23 @@ textarea:focus {
     padding: 0.3rem 0.6rem;
   }
 
+  .philosophy-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .philosophy-section {
+    padding: 1.5rem;
+  }
+
+  .philosophy-card {
+    padding: 1rem;
+  }
+
+  .about-content {
+    gap: 2rem;
+  }
+
   .project-card {
     padding: 1.5rem;
   }
@@ -2847,8 +2949,48 @@ textarea:focus {
     line-height: 1.6;
   }
 
+  .philosophy-section {
+    padding: 1.2rem;
+  }
+
+  .philosophy-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .philosophy-card {
+    padding: 0.9rem;
+  }
+
+  .philosophy-card .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .philosophy-card h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .philosophy-card p {
+    font-size: 0.8rem;
+  }
+
+  .formula-flow {
+    gap: 0.5rem;
+  }
+
+  .flow-step {
+    padding: 0.6rem;
+    min-width: 80px;
+  }
+
+  .step-text {
+    font-size: 0.75rem;
+  }
+
   .highlight-card {
-    padding: 1.5rem;
+    padding: 1.2rem;
   }
 
   .highlight-card h3 {
