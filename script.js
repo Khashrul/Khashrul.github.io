@@ -42,30 +42,37 @@ document.addEventListener('DOMContentLoaded', function() {
   const networkCanvas = document.getElementById('skillsNetwork');
   if (networkCanvas) {
     const ctx = networkCanvas.getContext('2d');
-    const rect = networkCanvas.getBoundingClientRect();
     
-    // Responsive initial sizing
-    const getResponsiveSize = () => {
-      const maxWidth = window.innerWidth - 40; // Leave padding
-      const maxHeight = window.innerHeight * 0.6; // Max 60% of viewport
-      const baseSize = Math.min(550, maxWidth, maxHeight);
-      return Math.max(300, baseSize); // Minimum 300px
+    // Wait for canvas to be fully rendered in DOM
+    const initCanvas = () => {
+      const rect = networkCanvas.getBoundingClientRect();
+      
+      // Responsive initial sizing
+      const getResponsiveSize = () => {
+        const maxWidth = window.innerWidth - 40; // Leave padding
+        const maxHeight = window.innerHeight * 0.6; // Max 60% of viewport
+        const baseSize = Math.min(550, maxWidth, maxHeight);
+        return Math.max(300, baseSize); // Minimum 300px
+      };
+      
+      // Use actual rect dimensions if available, otherwise calculate
+      let w = rect.width > 0 ? rect.width : getResponsiveSize();
+      let h = rect.height > 0 ? rect.height : getResponsiveSize();
+      
+      // Enable high DPI
+      const dpr = window.devicePixelRatio || 1;
+      // Setting width/height resets the context, so we scale after
+      networkCanvas.width = w * dpr;
+      networkCanvas.height = h * dpr;
+      ctx.scale(dpr, dpr);
+      networkCanvas.style.width = w + 'px';
+      networkCanvas.style.height = h + 'px';
+      
+      return { w, h };
     };
     
-    let w = rect.width || getResponsiveSize();
-    let h = rect.height || getResponsiveSize();
-    
-    // Set canvas size
-    networkCanvas.width = w;
-    networkCanvas.height = h;
-    
-    // Enable high DPI
-    const dpr = window.devicePixelRatio || 1;
-    networkCanvas.width = w * dpr;
-    networkCanvas.height = h * dpr;
-    ctx.scale(dpr, dpr);
-    networkCanvas.style.width = w + 'px';
-    networkCanvas.style.height = h + 'px';
+    // Initialize canvas dimensions
+    let { w, h } = initCanvas();
 
     // Node definitions - well spaced layout (base positions for 550x550 canvas)
     // Positions will be scaled responsively
@@ -280,38 +287,77 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
 
-    draw();
-
     // Handle window resize - responsive canvas
     function handleResize() {
       const rect = networkCanvas.getBoundingClientRect();
       const oldW = w;
       const oldH = h;
       
-      // Get actual container size
-      w = Math.min(rect.width || 550, window.innerWidth - 40); // Leave padding
-      h = Math.min(rect.height || 550, window.innerHeight * 0.6); // Max 60% of viewport
+      // Get actual container size - prefer rect dimensions
+      if (rect.width > 0 && rect.height > 0) {
+        w = rect.width;
+        h = rect.height;
+      } else {
+        // Fallback calculation
+        w = Math.min(550, window.innerWidth - 40);
+        h = Math.min(550, window.innerHeight * 0.6);
+      }
       
       // Ensure minimum size
       w = Math.max(w, 300);
       h = Math.max(h, 300);
       
       const dpr = window.devicePixelRatio || 1;
+      // Setting width/height automatically resets the context transformation
       networkCanvas.width = w * dpr;
       networkCanvas.height = h * dpr;
+      // Reset and scale context after setting dimensions
+      ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
       ctx.scale(dpr, dpr);
+      networkCanvas.style.width = w + 'px';
+      networkCanvas.style.height = h + 'px';
       
-      // Redraw if size changed
-      if (oldW !== w || oldH !== h) {
-        // Recalculate node positions for new canvas size
-        nodes = getNodeData();
-        draw();
-      }
+      // Recalculate node positions for new canvas size
+      nodes = getNodeData();
+      draw();
     }
     
+    // Initial draw - ensure it happens after DOM is ready
+    const performInitialDraw = () => {
+      // Recalculate canvas size in case it changed
+      const rect = networkCanvas.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        w = rect.width;
+        h = rect.height;
+        const dpr = window.devicePixelRatio || 1;
+        // Setting width/height automatically resets the context
+        networkCanvas.width = w * dpr;
+        networkCanvas.height = h * dpr;
+        // Reset and scale context after setting dimensions
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+        ctx.scale(dpr, dpr);
+        networkCanvas.style.width = w + 'px';
+        networkCanvas.style.height = h + 'px';
+        nodes = getNodeData();
+      }
+      draw();
+    };
+    
+    // Initial draw - try immediately and also after a short delay
+    performInitialDraw();
+    
+    // Also ensure it draws after everything is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', performInitialDraw);
+    }
+    
+    // Additional safety: draw after a short delay to ensure layout is complete
+    setTimeout(performInitialDraw, 50);
+    
+    // Draw again after window load to catch any late layout changes
+    window.addEventListener('load', performInitialDraw);
+    
     window.addEventListener('resize', handleResize);
-    // Initial responsive setup
-    handleResize();
 
     // Make canvas interactive
     let mouseX = 0;
