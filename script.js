@@ -89,9 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
         { id: 'laravel', label: 'Laravel', x: centerX - 160 * scale, y: centerY - 85 * scale, size: 26 * scale, color: '#39ff14', category: 'backend' },
         { id: 'microservices', label: 'Microservices', x: centerX - 190 * scale, y: centerY - 155 * scale, size: 24 * scale, color: '#39ff14', category: 'backend' },
         { id: 'restapi', label: 'REST APIs', x: centerX - 120 * scale, y: centerY - 35 * scale, size: 24 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'graphql', label: 'GraphQL', x: centerX - 100 * scale, y: centerY - 140 * scale, size: 24 * scale, color: '#39ff14', category: 'backend' },
         { id: 'php', label: 'PHP', x: centerX - 220 * scale, y: centerY - 110 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
         { id: 'mysql', label: 'MySQL', x: centerX - 220 * scale, y: centerY - 50 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
-        { id: 'redis', label: 'Redis', x: centerX - 130 * scale, y: centerY - 140 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'redis', label: 'Redis', x: centerX - 130 * scale, y: centerY - 160 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
         // Cloud & DevOps (Blue) - Top-right quadrant - Well spaced
         { id: 'aws', label: 'AWS', x: centerX + 180 * scale, y: centerY - 110 * scale, size: 24 * scale, color: '#4a90e2', category: 'cloud' },
         { id: 'docker', label: 'Docker', x: centerX + 150 * scale, y: centerY - 65 * scale, size: 20 * scale, color: '#4a90e2', category: 'cloud' },
@@ -118,15 +119,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const connections = [
       // All nodes connect to center
       ['center', 'laravel'], ['center', 'microservices'], ['center', 'php'], ['center', 'mysql'],
-      ['center', 'restapi'], ['center', 'redis'],
+      ['center', 'restapi'], ['center', 'graphql'], ['center', 'redis'],
       ['center', 'aws'], ['center', 'docker'], ['center', 'kubernetes'], ['center', 'elk'], ['center', 'cicd'],
       ['center', 'llms'], ['center', 'prompt'], ['center', 'aiintegration'],
       ['center', 'systemdesign'], ['center', 'mentoring'], ['center', 'agile'], ['center', 'leadership'],
       // Backend & Systems cluster connections
-      ['laravel', 'microservices'], ['laravel', 'php'], ['laravel', 'mysql'], ['laravel', 'redis'], ['laravel', 'restapi'],
+      ['laravel', 'microservices'], ['laravel', 'php'], ['laravel', 'mysql'], ['laravel', 'redis'], ['laravel', 'restapi'], ['laravel', 'graphql'],
       ['microservices', 'php'],
       ['php', 'mysql'],
       ['redis', 'restapi'],
+      ['restapi', 'graphql'], // Connect REST APIs and GraphQL
       // Cloud & DevOps cluster connections
       ['aws', 'elk'], ['aws', 'docker'], ['aws', 'kubernetes'],
       ['docker', 'kubernetes'], ['docker', 'cicd'],
