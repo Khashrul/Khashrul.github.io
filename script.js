@@ -43,8 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (networkCanvas) {
     const ctx = networkCanvas.getContext('2d');
     const rect = networkCanvas.getBoundingClientRect();
-    let w = rect.width || 550;
-    let h = rect.height || 550;
+    
+    // Responsive initial sizing
+    const getResponsiveSize = () => {
+      const maxWidth = window.innerWidth - 40; // Leave padding
+      const maxHeight = window.innerHeight * 0.6; // Max 60% of viewport
+      const baseSize = Math.min(550, maxWidth, maxHeight);
+      return Math.max(300, baseSize); // Minimum 300px
+    };
+    
+    let w = rect.width || getResponsiveSize();
+    let h = rect.height || getResponsiveSize();
     
     // Set canvas size
     networkCanvas.width = w;
@@ -58,34 +67,45 @@ document.addEventListener('DOMContentLoaded', function() {
     networkCanvas.style.width = w + 'px';
     networkCanvas.style.height = h + 'px';
 
-    // Node definitions - well spaced layout
-    // Shift everything up significantly to make room for bottom legend
-    const verticalOffset = -60;
-    const nodes = [
-      { id: 'center', label: 'B.M. Khashrul Alam', x: w/2, y: h/2 + verticalOffset, size: 38, color: '#ffd700', category: 'center' },
-      // Backend & Systems (Green) - Top-left quadrant - Well spaced
-      { id: 'laravel', label: 'Laravel', x: w/2 - 160, y: h/2 - 85 + verticalOffset, size: 26, color: '#39ff14', category: 'backend' },
-      { id: 'microservices', label: 'Microservices', x: w/2 - 190, y: h/2 - 155 + verticalOffset, size: 24, color: '#39ff14', category: 'backend' },
-      { id: 'restapi', label: 'REST APIs', x: w/2 - 120, y: h/2 - 35 + verticalOffset, size: 24, color: '#39ff14', category: 'backend' },
-      { id: 'php', label: 'PHP', x: w/2 - 220, y: h/2 - 110 + verticalOffset, size: 20, color: '#39ff14', category: 'backend' },
-      { id: 'mysql', label: 'MySQL', x: w/2 - 220, y: h/2 - 50 + verticalOffset, size: 20, color: '#39ff14', category: 'backend' },
-      { id: 'redis', label: 'Redis', x: w/2 - 130, y: h/2 - 140 + verticalOffset, size: 20, color: '#39ff14', category: 'backend' },
-      // Cloud & DevOps (Blue) - Top-right quadrant - Well spaced
-      { id: 'aws', label: 'AWS', x: w/2 + 180, y: h/2 - 110 + verticalOffset, size: 24, color: '#4a90e2', category: 'cloud' },
-      { id: 'docker', label: 'Docker', x: w/2 + 150, y: h/2 - 65 + verticalOffset, size: 20, color: '#4a90e2', category: 'cloud' },
-      { id: 'elk', label: 'ELK Stack', x: w/2 + 200, y: h/2 - 160 + verticalOffset, size: 20, color: '#4a90e2', category: 'cloud' },
-      { id: 'kubernetes', label: 'Kubernetes', x: w/2 + 230, y: h/2 - 65 + verticalOffset, size: 20, color: '#4a90e2', category: 'cloud' },
-      { id: 'cicd', label: 'CI/CD', x: w/2 + 180, y: h/2 - 25 + verticalOffset, size: 20, color: '#4a90e2', category: 'cloud' },
-      // AI & Innovation (Yellow) - Bottom-left quadrant - Well spaced
-      { id: 'llms', label: 'LLMs', x: w/2 - 180, y: h/2 + 80 + verticalOffset, size: 24, color: '#ffd700', category: 'ai' },
-      { id: 'prompt', label: 'Prompt Engine', x: w/2 - 120, y: h/2 + 155 + verticalOffset, size: 20, color: '#ffd700', category: 'ai' },
-      { id: 'aiintegration', label: 'AI Integration', x: w/2 - 150, y: h/2 + 110 + verticalOffset, size: 22, color: '#ffd700', category: 'ai' },
-      // Leadership (Red) - Bottom-right quadrant - Well spaced
-      { id: 'systemdesign', label: 'System Design', x: w/2 + 170, y: h/2 + 80 + verticalOffset, size: 24, color: '#ff6b6b', category: 'leadership' },
-      { id: 'mentoring', label: 'Mentoring', x: w/2 + 220, y: h/2 + 80 + verticalOffset, size: 20, color: '#ff6b6b', category: 'leadership' },
-      { id: 'agile', label: 'Agile/Scrum', x: w/2 + 220, y: h/2 + 145 + verticalOffset, size: 24, color: '#ff6b6b', category: 'leadership' },
-      { id: 'leadership', label: 'Team Leadership', x: w/2 + 170, y: h/2 + 155 + verticalOffset, size: 22, color: '#ff6b6b', category: 'leadership' },
-    ];
+    // Node definitions - well spaced layout (base positions for 550x550 canvas)
+    // Positions will be scaled responsively
+    const baseCanvasSize = 550;
+    const getNodeData = () => {
+      const scale = Math.min(w / baseCanvasSize, h / baseCanvasSize, 1.2); // Scale down for smaller screens
+      const verticalOffset = -60 * scale;
+      const centerX = w / 2;
+      const centerY = h / 2 + verticalOffset;
+      
+      return [
+        { id: 'center', label: 'B.M. Khashrul Alam', x: centerX, y: centerY, size: 38 * scale, color: '#ffd700', category: 'center' },
+        // Backend & Systems (Green) - Top-left quadrant - Well spaced
+        { id: 'laravel', label: 'Laravel', x: centerX - 160 * scale, y: centerY - 85 * scale, size: 26 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'microservices', label: 'Microservices', x: centerX - 190 * scale, y: centerY - 155 * scale, size: 24 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'restapi', label: 'REST APIs', x: centerX - 120 * scale, y: centerY - 35 * scale, size: 24 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'php', label: 'PHP', x: centerX - 220 * scale, y: centerY - 110 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'mysql', label: 'MySQL', x: centerX - 220 * scale, y: centerY - 50 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
+        { id: 'redis', label: 'Redis', x: centerX - 130 * scale, y: centerY - 140 * scale, size: 20 * scale, color: '#39ff14', category: 'backend' },
+        // Cloud & DevOps (Blue) - Top-right quadrant - Well spaced
+        { id: 'aws', label: 'AWS', x: centerX + 180 * scale, y: centerY - 110 * scale, size: 24 * scale, color: '#4a90e2', category: 'cloud' },
+        { id: 'docker', label: 'Docker', x: centerX + 150 * scale, y: centerY - 65 * scale, size: 20 * scale, color: '#4a90e2', category: 'cloud' },
+        { id: 'elk', label: 'ELK Stack', x: centerX + 200 * scale, y: centerY - 160 * scale, size: 20 * scale, color: '#4a90e2', category: 'cloud' },
+        { id: 'kubernetes', label: 'Kubernetes', x: centerX + 230 * scale, y: centerY - 65 * scale, size: 20 * scale, color: '#4a90e2', category: 'cloud' },
+        { id: 'cicd', label: 'CI/CD', x: centerX + 180 * scale, y: centerY - 25 * scale, size: 20 * scale, color: '#4a90e2', category: 'cloud' },
+        // AI & Innovation (Yellow) - Bottom-left quadrant - Well spaced
+        { id: 'llms', label: 'LLMs', x: centerX - 180 * scale, y: centerY + 80 * scale, size: 24 * scale, color: '#ffd700', category: 'ai' },
+        { id: 'rag', label: 'RAG Pipelines', x: centerX - 200 * scale, y: centerY + 145 * scale, size: 22 * scale, color: '#ffd700', category: 'ai' },
+        { id: 'prompt', label: 'Prompt Engine', x: centerX - 120 * scale, y: centerY + 155 * scale, size: 20 * scale, color: '#ffd700', category: 'ai' },
+        { id: 'aiintegration', label: 'AI Integration', x: centerX - 150 * scale, y: centerY + 110 * scale, size: 22 * scale, color: '#ffd700', category: 'ai' },
+        // Leadership (Red) - Bottom-right quadrant - Well spaced
+        { id: 'systemdesign', label: 'System Design', x: centerX + 170 * scale, y: centerY + 80 * scale, size: 24 * scale, color: '#ff6b6b', category: 'leadership' },
+        { id: 'mentoring', label: 'Mentoring', x: centerX + 220 * scale, y: centerY + 80 * scale, size: 20 * scale, color: '#ff6b6b', category: 'leadership' },
+        { id: 'agile', label: 'Agile/Scrum', x: centerX + 220 * scale, y: centerY + 145 * scale, size: 24 * scale, color: '#ff6b6b', category: 'leadership' },
+        { id: 'leadership', label: 'Team Leadership', x: centerX + 170 * scale, y: centerY + 155 * scale, size: 22 * scale, color: '#ff6b6b', category: 'leadership' },
+      ];
+    };
+    
+    // Initialize nodes
+    let nodes = getNodeData();
 
     // Connections - matching the reference design exactly
     const connections = [
@@ -262,17 +282,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
     draw();
 
-    // Handle window resize
-    window.addEventListener('resize', () => {
+    // Handle window resize - responsive canvas
+    function handleResize() {
       const rect = networkCanvas.getBoundingClientRect();
-      w = rect.width || 550;
-      h = rect.height || 550;
+      const oldW = w;
+      const oldH = h;
+      
+      // Get actual container size
+      w = Math.min(rect.width || 550, window.innerWidth - 40); // Leave padding
+      h = Math.min(rect.height || 550, window.innerHeight * 0.6); // Max 60% of viewport
+      
+      // Ensure minimum size
+      w = Math.max(w, 300);
+      h = Math.max(h, 300);
+      
       const dpr = window.devicePixelRatio || 1;
       networkCanvas.width = w * dpr;
       networkCanvas.height = h * dpr;
       ctx.scale(dpr, dpr);
-      draw();
-    });
+      
+      // Redraw if size changed
+      if (oldW !== w || oldH !== h) {
+        // Recalculate node positions for new canvas size
+        nodes = getNodeData();
+        draw();
+      }
+    }
+    
+    window.addEventListener('resize', handleResize);
+    // Initial responsive setup
+    handleResize();
 
     // Make canvas interactive
     let mouseX = 0;
@@ -508,6 +547,180 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize smooth scroll
   initSmoothScroll();
 
+  // Hamburger Menu Toggle
+  const burgerMenu = document.querySelector('.burger-menu');
+  const navMenu = document.querySelector('.nav-menu');
+  
+  if (burgerMenu && navMenu) {
+    burgerMenu.addEventListener('click', function() {
+      const isActive = navMenu.classList.toggle('active');
+      burgerMenu.classList.toggle('active');
+      burgerMenu.setAttribute('aria-expanded', isActive);
+      
+      // Prevent body scroll when menu is open
+      if (isActive) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close menu when clicking on a link
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        burgerMenu.classList.remove('active');
+        burgerMenu.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const isClickInsideNav = navMenu.contains(event.target);
+      const isClickOnBurger = burgerMenu.contains(event.target);
+      
+      if (!isClickInsideNav && !isClickOnBurger && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        burgerMenu.classList.remove('active');
+        burgerMenu.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        burgerMenu.classList.remove('active');
+        burgerMenu.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+
+  // Active navigation link highlighting
+  function updateActiveNav() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+    
+    const scrollPos = window.scrollY + 100;
+    
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.offsetHeight;
+      const sectionId = section.getAttribute('id');
+      
+      if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${sectionId}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }
+
+  // Update active nav on scroll
+  window.addEventListener('scroll', updateActiveNav);
+  updateActiveNav(); // Initial call
+
+  // Scroll to top button
+  const scrollTopBtn = document.createElement('button');
+  scrollTopBtn.className = 'scroll-to-top';
+  scrollTopBtn.innerHTML = '↑';
+  scrollTopBtn.setAttribute('aria-label', 'Scroll to top');
+  scrollTopBtn.setAttribute('title', 'Scroll to top');
+  document.body.appendChild(scrollTopBtn);
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+
+  // Show/hide scroll to top button
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      scrollTopBtn.classList.add('visible');
+    } else {
+      scrollTopBtn.classList.remove('visible');
+    }
+  });
+
+  // Form Validation - Real-time feedback
+  function initFormValidation() {
+    const contactForm = document.getElementById('contactForm');
+    if (!contactForm) return;
+
+    const inputs = contactForm.querySelectorAll('input, textarea');
+    
+    inputs.forEach(input => {
+      // Real-time validation
+      input.addEventListener('blur', function() {
+        validateField(this);
+      });
+
+      input.addEventListener('input', function() {
+        if (this.classList.contains('error')) {
+          validateField(this);
+        }
+      });
+    });
+
+    function validateField(field) {
+      const value = field.value.trim();
+      let isValid = true;
+      let errorMessage = '';
+
+      // Remove previous error
+      field.classList.remove('error');
+      const existingError = field.parentNode.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove();
+      }
+
+      // Validation rules
+      if (field.hasAttribute('required') && !value) {
+        isValid = false;
+        errorMessage = 'This field is required';
+      } else if (field.type === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid email address';
+        }
+      } else if (field.type === 'text' && field.id === 'name' && value) {
+        if (value.length < 2) {
+          isValid = false;
+          errorMessage = 'Name must be at least 2 characters';
+        }
+      } else if (field.tagName === 'TEXTAREA' && value) {
+        if (value.length < 10) {
+          isValid = false;
+          errorMessage = 'Message must be at least 10 characters';
+        }
+      }
+
+      // Show error if invalid
+      if (!isValid) {
+        field.classList.add('error');
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.textContent = errorMessage;
+        errorDiv.style.cssText = 'color: var(--accent-red); font-size: 0.8rem; margin-top: 0.25rem; font-family: var(--font-mono);';
+        field.parentNode.appendChild(errorDiv);
+      }
+
+      return isValid;
+    }
+  }
+
+  initFormValidation();
+
   // Contact Form Email Functionality
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
@@ -517,6 +730,42 @@ document.addEventListener('DOMContentLoaded', function() {
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
+      // Validate all fields before submission
+      const inputs = contactForm.querySelectorAll('input, textarea');
+      let allValid = true;
+      inputs.forEach(input => {
+        const errorMsg = input.parentNode.querySelector('.error-message');
+        if (errorMsg) errorMsg.remove();
+        input.classList.remove('error');
+        
+        const value = input.value.trim();
+        if (input.hasAttribute('required') && !value) {
+          allValid = false;
+          input.classList.add('error');
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'error-message';
+          errorDiv.textContent = 'This field is required';
+          errorDiv.style.cssText = 'color: var(--accent-red); font-size: 0.8rem; margin-top: 0.25rem; font-family: var(--font-mono);';
+          input.parentNode.appendChild(errorDiv);
+        } else if (input.type === 'email' && value) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(value)) {
+            allValid = false;
+            input.classList.add('error');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = 'Please enter a valid email address';
+            errorDiv.style.cssText = 'color: var(--accent-red); font-size: 0.8rem; margin-top: 0.25rem; font-family: var(--font-mono);';
+            input.parentNode.appendChild(errorDiv);
+          }
+        }
+      });
+      
+      if (!allValid) {
+        showNotification('Please fix the errors in the form', 'error');
+        return;
+      }
+      
       const submitBtn = contactForm.querySelector('.submit-btn');
       const btnText = submitBtn.querySelector('.btn-text');
       const originalText = btnText.textContent;
@@ -525,6 +774,7 @@ document.addEventListener('DOMContentLoaded', function() {
       submitBtn.disabled = true;
       btnText.textContent = 'Sending...';
       submitBtn.style.opacity = '0.6';
+      submitBtn.style.cursor = 'not-allowed';
       
       // Get form data
       const formData = {
@@ -559,6 +809,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.style.opacity = '1';
             submitBtn.style.backgroundColor = '';
             submitBtn.style.color = '';
+            submitBtn.style.cursor = 'pointer';
           }, 3000);
           
           // Show success notification
@@ -576,6 +827,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.style.opacity = '1';
             submitBtn.style.backgroundColor = '';
             submitBtn.style.color = '';
+            submitBtn.style.cursor = 'pointer';
           }, 3000);
           
           // Show error notification

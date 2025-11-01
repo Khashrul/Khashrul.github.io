@@ -6,7 +6,7 @@
 }
 
 :root {
-  /* Color Scheme - Black and White Theme */
+  /* Color Scheme - Black and White Theme with Enhanced Accents */
   --primary-bg: #000000;
   --secondary-bg: #111111;
   --tertiary-bg: #1a1a1a;
@@ -16,6 +16,16 @@
   --accent-color: #ffffff;
   --border-color: #333333;
   --shadow-color: rgba(255, 255, 255, 0.1);
+  
+  /* Accent Colors */
+  --accent-green: #39ff14;
+  --accent-gold: #ffd700;
+  --accent-blue: #4a90e2;
+  --accent-red: #ff6b6b;
+  
+  /* Interactive States */
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --focus-outline: rgba(57, 255, 20, 0.5);
 
   /* Fonts - Simplified */
   --font-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -248,6 +258,46 @@ div {
 
 .nav-menu a:hover::before {
   opacity: 1;
+}
+
+/* Hamburger Menu Button */
+.burger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+  position: relative;
+}
+
+.burger-line {
+  width: 100%;
+  height: 3px;
+  background: var(--text-primary);
+  border-radius: 2px;
+  transition: var(--transition-medium);
+  transform-origin: center;
+}
+
+.burger-menu.active .burger-line:nth-child(1) {
+  transform: translateY(10px) rotate(45deg);
+}
+
+.burger-menu.active .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-menu.active .burger-line:nth-child(3) {
+  transform: translateY(-10px) rotate(-45deg);
+}
+
+.burger-menu:hover .burger-line {
+  background: var(--accent-green);
 }
 
 /* Main Content */
@@ -1674,6 +1724,37 @@ div {
   box-shadow: 0 0 10px var(--shadow-color);
 }
 
+.form-group input.error,
+.form-group textarea.error {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
+
+.form-group input.error:focus,
+.form-group textarea.error:focus {
+  border-color: var(--accent-red);
+  box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.error-message {
+  color: var(--accent-red);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .submit-btn {
   background: var(--text-primary);
   border: none;
@@ -2084,7 +2165,89 @@ div {
   }
 }
 
+/* Focus States for Accessibility */
+*:focus {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
+button:focus,
+a:focus,
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-green);
+  outline-offset: 2px;
+}
+
+/* Active Navigation Link */
+.nav-menu a.active {
+  color: var(--accent-green);
+  background: var(--hover-bg);
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: var(--secondary-bg);
+  border: 2px solid var(--accent-green);
+  border-radius: 50%;
+  color: var(--accent-green);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: var(--transition-medium);
+  font-size: 1.5rem;
+  box-shadow: 0 4px 15px rgba(57, 255, 20, 0.2);
+}
+
+.scroll-to-top.visible {
+  display: flex;
+}
+
+.scroll-to-top:hover {
+  background: var(--accent-green);
+  color: var(--primary-bg);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(57, 255, 20, 0.4);
+}
+
+.scroll-to-top:active {
+  transform: translateY(-2px);
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .container {
+    max-width: 100%;
+    padding: 0 2rem;
+  }
+
+  .hero-container {
+    max-width: 100%;
+  }
+
+  .skills-network {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  .skills-content {
+    flex-direction: column;
+  }
+
+  .skills-details {
+    width: 100%;
+  }
+}
+
 @media (max-width: 1024px) {
   .hero-container {
     grid-template-columns: 1fr;
@@ -2102,32 +2265,175 @@ div {
   .projects-grid {
     grid-template-columns: 1fr;
   }
+
+  .skills-network {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+    margin: 0 auto 2rem;
+  }
+
+  .skills-network-wrapper {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .network-legend {
+    position: static;
+    margin-top: 1rem;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    padding: 0;
+  }
 }
 
 @media (max-width: 768px) {
   .nav-container {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    position: relative;
+  }
+
+  .burger-menu {
+    display: flex;
   }
 
   .nav-menu {
-    gap: 1rem;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 80px);
+    background: var(--primary-bg);
+    border-top: 1px solid var(--border-color);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding: 2rem 0;
+    gap: 0;
+    transform: translateX(-100%);
+    transition: transform var(--transition-medium);
+    z-index: 1000;
+    overflow-y: auto;
   }
 
-  .terminal-prompt {
+  .nav-menu.active {
+    transform: translateX(0);
+  }
+
+  .nav-menu li {
+    width: 100%;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .nav-menu a {
+    display: block;
+    padding: 1.25rem 2rem;
+    font-size: 1rem;
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .nav-menu a:hover {
+    background: var(--hover-bg);
+    color: var(--accent-green);
+  }
+
+  .nav-menu a::before {
     display: none;
   }
 
+  .terminal-prompt {
+    font-size: 0.75rem;
+  }
+
   .section-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
   }
 
   .hero-container {
     padding: 0 1rem;
+    gap: 2rem;
+  }
+
+  .hero-section {
+    min-height: auto;
+    padding: 3rem 0;
   }
 
   .container {
     padding: 0 1rem;
+  }
+
+  .main-content {
+    margin-top: 70px;
+  }
+
+  .terminal-nav {
+    padding: 0.5rem 0;
+  }
+
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .profile-name {
+    font-size: 1.8rem;
+  }
+
+  .profile-title {
+    font-size: 0.9rem;
+  }
+
+  .profile-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .terminal-body {
+    padding: 1rem;
+    font-size: 0.85rem;
+    min-height: 200px;
+  }
+
+  .skills-network {
+    width: 100%;
+    height: 400px;
+    max-width: 100%;
+  }
+
+  .skills-network-wrapper {
+    width: 100%;
+  }
+
+  .network-legend {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .legend-item {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .project-card {
+    padding: 1.5rem;
+  }
+
+  .project-tech {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tech {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
   }
 
   .arch-flow {
@@ -2141,6 +2447,7 @@ div {
 
   .arch-metrics {
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .philosophy-formula {
@@ -2148,36 +2455,165 @@ div {
     align-items: center;
   }
 
-  .chat-window {
-    width: 300px;
-    height: 350px;
+  .contact-content {
+    flex-direction: column;
   }
 
-  .world-map {
-    height: 200px;
+  .contact-form-container {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .contact-details {
+    margin-bottom: 2rem;
+  }
+
+  .chat-window {
+    width: calc(100vw - 2rem);
+    height: 400px;
+    max-width: 400px;
+    right: 1rem;
+  }
+
+  .scroll-to-top {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
   }
 }
 
 @media (max-width: 480px) {
+  .nav-menu {
+    top: 70px;
+    height: calc(100vh - 70px);
+  }
+
+  .nav-menu a {
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .terminal-prompt {
+    font-size: 0.7rem;
+  }
+
   .profile-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-title {
+    font-size: 0.85rem;
+    margin: 0.5rem 0;
+  }
+
+  .profile-subtitle {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+
+  .profile-links {
+    margin-top: 1rem;
+  }
+
+  .profile-link {
+    font-size: 0.8rem;
   }
 
   .terminal-body {
     padding: 0.75rem;
-    min-height: 250px;
+    font-size: 0.8rem;
+    min-height: 180px;
   }
 
-  .architecture-diagram {
-    padding: 1rem;
+  .terminal-line {
+    margin-bottom: 0.5rem;
+  }
+
+  .skills-network {
+    height: 350px;
+  }
+
+  .network-legend {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .legend-item {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
   }
 
   .project-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .project-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .project-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .highlight-item {
+    font-size: 0.85rem;
+    padding: 0.4rem 0;
+  }
+
+  .highlight-icon {
+    font-size: 1rem;
   }
 
   .contact-form-container {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+
+  .submit-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .contact-item {
+    margin-bottom: 1rem;
+  }
+
+  .contact-icon {
+    font-size: 1.2rem;
+  }
+
+  .contact-label {
+    font-size: 0.8rem;
   }
 
   .ai-chat-widget {
@@ -2187,10 +2623,74 @@ div {
 
   .chat-toggle {
     padding: 0.75rem 1rem;
+    font-size: 0.85rem;
   }
 
   .chat-text {
     display: none;
+  }
+
+  .chat-window {
+    width: calc(100vw - 1rem);
+    height: 350px;
+    right: 0.5rem;
+    bottom: 80px;
+  }
+
+  .scroll-to-top {
+    bottom: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .about-text {
+    font-size: 0.9rem;
+  }
+
+  .handwritten-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .highlight-card {
+    padding: 1.5rem;
+  }
+
+  .highlight-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .highlight-card p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .nav-menu {
+    font-size: 0.75rem;
+    gap: 0.2rem;
+  }
+
+  .nav-menu a {
+    padding: 0.25rem 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .skills-network {
+    height: 300px;
+  }
+
+  .project-card {
+    padding: 1rem;
+  }
+
+  .contact-form-container {
+    padding: 1rem;
   }
 }
 
