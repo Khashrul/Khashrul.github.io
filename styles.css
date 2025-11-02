@@ -879,6 +879,7 @@ body:not(.loading) .hero-right {
   flex-direction: column;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  text-align: left;
 }
 
 .about-text p {
@@ -2666,7 +2667,16 @@ textarea:focus {
   .hero-container {
     grid-template-columns: 1fr;
     gap: 3rem;
-    text-align: center;
+  }
+
+  /* Hero Section - Terminal Text Alignment
+     Ensure terminal commands and output are left-aligned in responsive view
+     for better readability on mobile devices */
+  .terminal-body,
+  .terminal-line,
+  .output-line,
+  .command {
+    text-align: left;
   }
 
   .about-content,
@@ -2724,10 +2734,21 @@ textarea:focus {
 }
 
 @media (max-width: 768px) {
-  /* Loading Screen Responsive */
+  /* Loading Screen - Responsive Styles
+     Ensure all terminal boot text is left-aligned for better mobile UX
+     Reduce font sizes and adjust spacing for smaller screens */
+  #loading-screen {
+    align-items: flex-start;
+    padding: 2rem 1rem;
+    justify-content: center;
+  }
+
   .terminal-boot {
     font-size: 0.9em;
     padding: 0 1rem;
+    text-align: left;
+    margin-left: 0;
+    margin-right: auto;
   }
   
   .boot-line {
@@ -2735,11 +2756,20 @@ textarea:focus {
     margin-bottom: 0.4rem;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .boot-text {
+    text-align: left;
   }
   
+  /* Progress bar alignment matches terminal text */
   .loading-progress {
     width: 280px;
     max-width: 85%;
+    margin-left: 1rem;
+    margin-right: auto;
   }
 
   /* Professional Journey Responsive */
@@ -2968,6 +2998,15 @@ textarea:focus {
     min-height: 200px;
   }
 
+  /* Hero Terminal - Ensure Left Alignment (768px)
+     Maintain left alignment for terminal commands and output on tablet/mobile */
+  .terminal-body,
+  .terminal-line,
+  .output-line,
+  .command {
+    text-align: left;
+  }
+
   .skills-network {
     width: 100%;
     height: 400px;
@@ -3027,6 +3066,10 @@ textarea:focus {
     gap: 2rem;
   }
 
+  .about-text {
+    text-align: left;
+  }
+
   /* Skills Section Responsive */
   .skill-item {
     gap: 0.75rem;
@@ -3080,6 +3123,54 @@ textarea:focus {
     align-items: center;
   }
 
+  /* Engineering Philosophy - Formula Flow Responsive Styles
+     Convert horizontal flow (→) to vertical flow (↓) for mobile devices
+     Steps stack vertically with down arrows indicating progression */
+  .philosophy-formula-modern {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .formula-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .flow-step {
+    width: 100%;
+    max-width: 280px;
+    min-width: auto;
+    padding: 0.75rem;
+    position: relative;
+    margin: 0 auto 1.5rem auto;
+  }
+
+  .flow-step:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Hide horizontal arrows on mobile */
+  .flow-arrow {
+    display: none;
+  }
+
+  /* Add vertical arrow indicator below each step (except the last)
+     Using CSS ::after pseudo-element to show downward flow */
+  .flow-step:not(:last-of-type)::after {
+    content: '↓';
+    position: absolute;
+    bottom: -1.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: bold;
+    line-height: 1;
+    z-index: 1;
+  }
+
   .contact-content {
     flex-direction: column;
   }
@@ -3110,21 +3201,39 @@ textarea:focus {
 }
 
 @media (max-width: 480px) {
-  /* Loading Screen Responsive */
+  /* Loading Screen - Small Screen Responsive
+     Further reduce sizes and maintain left alignment for small mobile devices */
+  #loading-screen {
+    align-items: flex-start;
+    padding: 1.5rem 1rem;
+    justify-content: center;
+  }
+
   .terminal-boot {
     font-size: 0.85em;
     padding: 0 1rem;
+    text-align: left;
+    margin-left: 0;
+    margin-right: auto;
   }
   
   .boot-line {
     font-size: 0.85em;
     margin-bottom: 0.35rem;
     line-height: 1.4;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .boot-text {
+    text-align: left;
   }
   
   .loading-progress {
     width: 250px;
     max-width: 80%;
+    margin-left: 1rem;
+    margin-right: auto;
   }
 
   /* Professional Journey - Small Screens */
@@ -3342,6 +3451,15 @@ textarea:focus {
     margin-bottom: 0.5rem;
   }
 
+  /* Hero Terminal - Ensure Left Alignment (480px)
+     Maintain left alignment for terminal commands and output on small mobile devices */
+  .terminal-body,
+  .terminal-line,
+  .output-line,
+  .command {
+    text-align: left;
+  }
+
   .skills-network {
     height: 350px;
     margin-bottom: 1.5rem;
@@ -3463,6 +3581,11 @@ textarea:focus {
 
   .about-text {
     font-size: 0.9rem;
+    text-align: left;
+  }
+
+  .about-text p {
+    text-align: left;
   }
 
   .handwritten-text {
@@ -3497,17 +3620,42 @@ textarea:focus {
     font-size: 0.8rem;
   }
 
+  /* Engineering Philosophy - Formula Flow (480px)
+     Adjust sizing and spacing for small mobile devices
+     Maintain vertical flow layout with down arrows */
+  .philosophy-formula-modern {
+    padding: 0.875rem;
+    margin-top: 1.25rem;
+  }
+
   .formula-flow {
-    gap: 0.5rem;
+    gap: 0;
   }
 
   .flow-step {
-    padding: 0.6rem;
-    min-width: 80px;
+    padding: 0.6rem 0.5rem;
+    min-width: auto;
+    max-width: 260px;
+    width: 100%;
+    margin: 0 auto 1.25rem auto;
+  }
+
+  .flow-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .flow-step:not(:last-of-type)::after {
+    bottom: -1.1rem;
+    font-size: 1rem;
+  }
+
+  .step-number {
+    font-size: 0.7rem;
   }
 
   .step-text {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    line-height: 1.3;
   }
 
   .highlight-card {
@@ -3524,10 +3672,21 @@ textarea:focus {
 }
 
 @media (max-width: 360px) {
-  /* Loading Screen Responsive */
+  /* Loading Screen - Extra Small Screen Responsive
+     Minimal padding and font sizes for very small devices
+     Maintain consistent left alignment throughout */
+  #loading-screen {
+    align-items: flex-start;
+    padding: 1.5rem 0.75rem;
+    justify-content: center;
+  }
+
   .terminal-boot {
     font-size: 0.75em;
     padding: 0 0.75rem;
+    text-align: left;
+    margin-left: 0;
+    margin-right: auto;
   }
   
   .boot-line {
@@ -3535,6 +3694,12 @@ textarea:focus {
     margin-bottom: 0.3rem;
     line-height: 1.3;
     gap: 0.4rem;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .boot-text {
+    text-align: left;
   }
   
   .boot-icon {
@@ -3546,6 +3711,8 @@ textarea:focus {
     width: 220px;
     max-width: 75%;
     height: 3px;
+    margin-left: 0.75rem;
+    margin-right: auto;
   }
 
   /* Professional Journey - Extra Small Screens */
@@ -3645,6 +3812,32 @@ textarea:focus {
 
   .nav-menu a {
     padding: 0.25rem 0.5rem;
+  }
+
+  /* Philosophy Formula Flow - Extra Small Screens */
+  .philosophy-formula-modern {
+    padding: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .flow-step {
+    max-width: 240px;
+    padding: 0.55rem 0.4rem;
+    margin: 0 auto 1.1rem auto;
+  }
+
+  .flow-step:not(:last-of-type)::after {
+    bottom: -1rem;
+    font-size: 0.9rem;
+  }
+
+  .step-number {
+    font-size: 0.65rem;
+  }
+
+  .step-text {
+    font-size: 0.65rem;
+    line-height: 1.2;
   }
 
   .section-title {
