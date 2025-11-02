@@ -171,34 +171,46 @@ document.addEventListener('DOMContentLoaded', function() {
   // Animate skill bars with staggered animation when scrolled into view
   const skillBars = document.querySelectorAll('.skill-progress');
   
-  // Set initial state
+  // Set initial state - ensure all bars start at 0% and have no transition
   skillBars.forEach(bar => {
     bar.style.width = '0%';
+    bar.style.transition = 'none'; // No transition until animation starts
   });
+  
+  let hasAnimated = false; // Prevent multiple animations
   
   // Intersection Observer to trigger animations when section is visible
   const animateSkillBars = (entries, observer) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
+      if (entry.isIntersecting && !hasAnimated) {
+        hasAnimated = true;
         const skillProgressBars = entry.target.querySelectorAll('.skill-progress');
-        skillProgressBars.forEach((bar, index) => {
-          const progress = bar.getAttribute('data-progress');
-          if (progress) {
-            // Staggered animation - each bar animates with delay
-            setTimeout(() => {
-              bar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
-              bar.style.width = progress + '%';
-            }, index * 100); // 100ms delay between each bar
-          }
+        
+        // Use requestAnimationFrame for smoother animation start
+        requestAnimationFrame(() => {
+          skillProgressBars.forEach((bar, index) => {
+            const progress = bar.getAttribute('data-progress');
+            if (progress) {
+              // Add transition property before animating
+              setTimeout(() => {
+                bar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                // Force reflow to ensure transition is applied
+                bar.offsetHeight;
+                // Now animate to target width
+                bar.style.width = progress + '%';
+              }, index * 80); // 80ms delay between each bar for smoother stagger
+            }
+          });
         });
+        
         observer.unobserve(entry.target);
       }
     });
   };
   
   const skillsObserver = new IntersectionObserver(animateSkillBars, {
-    threshold: 0.2, // Trigger when 20% of section is visible
-    rootMargin: '0px'
+    threshold: 0.15, // Trigger when 15% of section is visible (earlier trigger)
+    rootMargin: '0px 0px -100px 0px' // Trigger slightly before section enters viewport
   });
   
   // Observe the skills section
@@ -712,56 +724,65 @@ document.addEventListener('DOMContentLoaded', function() {
     const targetId = this.getAttribute('href').substring(1);
     const targetSection = document.getElementById(targetId);
     
-    // Navigating to section
-    
     if (targetSection) {
-      // Try modern scrollIntoView first (fallback)
-      if (targetSection.scrollIntoView) {
-        // Using scrollIntoView method
-        targetSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      } else {
-        // Fallback to custom smooth scroll
-        const navHeight = document.querySelector('.terminal-nav').offsetHeight || 80;
-        const targetPosition = targetSection.offsetTop - navHeight;
-        
-        // Using custom smooth scroll
-        smoothScrollTo(targetPosition, 1000);
-      }
+      // Get navigation bar height for proper offset
+      const nav = document.querySelector('.terminal-nav');
+      const navHeight = nav ? nav.offsetHeight : 80;
+      
+      // Calculate target position with offset
+      const targetPosition = targetSection.offsetTop - navHeight - 20; // 20px extra padding
+      
+      // Use custom smooth scroll with better easing for smoother transition
+      smoothScrollTo(targetPosition, 800);
     }
   }
 
-  // Smooth scroll function with easing
+  // Smooth scroll function with enhanced easing
   function smoothScrollTo(targetPosition, duration) {
-    const startPosition = window.pageYOffset || window.scrollY;
+    const startPosition = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
     const distance = targetPosition - startPosition;
     let startTime = null;
 
-    // Starting smooth scroll
+    // Cancel any existing scroll animation
+    if (window.scrollAnimationFrame) {
+      cancelAnimationFrame(window.scrollAnimationFrame);
+    }
+
+    // Enhanced easing function - easeOutCubic for smoother feel
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    // Alternative: easeInOutCubic (uncomment to use instead)
+    // function easeInOutCubic(t) {
+    //   return t < 0.5
+    //     ? 4 * t * t * t
+    //     : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    // }
 
     function animation(currentTime) {
       if (startTime === null) startTime = currentTime;
       const timeElapsed = currentTime - startTime;
       const progress = Math.min(timeElapsed / duration, 1);
       
-      // Easing function (easeInOutCubic)
-      const ease = progress < 0.5 
-        ? 4 * progress * progress * progress 
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      // Use enhanced easing for smoother transition
+      const ease = easeOutCubic(progress);
       
       const currentPosition = startPosition + distance * ease;
+      
+      // Direct scroll positioning for manual animation control
       window.scrollTo(0, currentPosition);
       
       if (progress < 1) {
-        requestAnimationFrame(animation);
+        window.scrollAnimationFrame = requestAnimationFrame(animation);
       } else {
-        // Smooth scroll completed
+        // Ensure we end exactly at target position
+        window.scrollTo(0, targetPosition);
+        window.scrollAnimationFrame = null;
       }
     }
     
-    requestAnimationFrame(animation);
+    window.scrollAnimationFrame = requestAnimationFrame(animation);
   }
 
   // Initialize smooth scroll
